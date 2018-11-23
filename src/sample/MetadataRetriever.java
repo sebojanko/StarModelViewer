@@ -1,5 +1,6 @@
 package sample;
 
+import java.sql.*;
 import java.util.ArrayList;
 
 /**
@@ -7,51 +8,80 @@ import java.util.ArrayList;
  * janko.sebastian@gmail.com
  */
 public class MetadataRetriever {
-    public MetadataRetriever() {
-        //connect to metadata db
+    private Connection dbConn;
+
+    MetadataRetriever() {
+        dbConn = connectToDB();
     }
 
-    public ArrayList<String> getFactTables() {
-        //select * from tablica where sifTipTablica = 1
-        return null;
+    private Connection connectToDB() {
+        Connection conn = null;
+
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            System.out.println("SQL Server JDBC driver je ucitan i registriran.");
+        } catch (ClassNotFoundException exception) {
+            System.out.println("Pogreska: nije uspjelo ucitavanje JDBC driver-a.");
+            System.out.println(exception.getMessage());
+            System.exit(-1);
+        }
+
+        try {
+            conn = DriverManager.getConnection(ConfigReader.getConnectionString());
+            System.out.println("Konekcija je uspostavljena.");
+        } catch (SQLException exception) {
+            System.out.println("Pogreska: nije uspjelo uspostavljanje konekcije.");
+            System.out.println(exception.getErrorCode() + " " + exception.getMessage());
+            System.exit(-1);
+        }
+
+        return conn;
     }
 
-    public ArrayList<String> getAttributes() {
-        /*SELECT *
-                FROM tabAtribut, agrFun, tablica, tabAtributAgrFun
-        WHERE tabAtribut.sifTablica =  100
-                --  Zamijeniti
-        AND tabAtribut.sifTablica = tablica.sifTablica
-        AND tabAtribut.sifTablica  = tabAtributAgrFun.sifTablica
-        AND tabAtribut.rbrAtrib  = tabAtributAgrFun.rbrAtrib
-        AND tabAtributAgrFun.sifAgrFun = agrFun.sifAgrFun
-        AND tabAtribut.sifTablica = tablica.sifTablica
-        AND sifTipAtrib = 1
-        ORDER BY tabAtribut.rbrAtrib*/
-        return null;
+    public ArrayList<FactTable> getFactTables() {
+        ArrayList<FactTable> factTables = new ArrayList<>();
+        try {
+            Statement stmt = dbConn.createStatement();
+            ResultSet rs = stmt.executeQuery(Queries.GET_FACT_TABLES);
+            while (rs.next()) {
+                FactTable ft = new FactTable(rs.getInt("sifTablica"), rs.getString("nazTablica").trim(), rs.getString("nazSQLTablica").trim());
+                factTables.add(ft);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return factTables;
     }
 
-    public ArrayList<String> getDimensions() {
-        /*SELECT   dimTablica.nazTablica
-        , dimTablica.nazSQLTablica  AS nazSqlDimTablica
-        , cinjTablica.nazSQLTablica AS nazSqlCinjTablica
-        , cinjTabAtribut.imeSqlAtrib AS cinjTabKljuc
-        , dimTabAtribut.imeSqlAtrib  AS dimTabKljuc
-        , tabAtribut.*
-        FROM tabAtribut, dimCinj
-        , tablica dimTablica, tablica cinjTablica
-        , tabAtribut cinjTabAtribut, tabAtribut dimTabAtribut
-        WHERE dimCinj.sifDimTablica  = dimTablica.sifTablica
-        AND dimCinj.sifCinjTablica = cinjTablica.sifTablica
-        AND dimCinj.sifCinjTablica = cinjTabAtribut.sifTablica
-        AND dimCinj.rbrCinj = cinjTabAtribut.rbrAtrib
-        AND dimCinj.sifDimTablica = dimTabAtribut.sifTablica
-        AND dimCinj.rbrDim = dimTabAtribut.rbrAtrib
-        AND tabAtribut.sifTablica  = dimCinj.sifDimTablica
-        AND sifCinjTablica = 100 --  Zamijeniti
-        AND tabAtribut.sifTipAtrib = 2
-        ORDER BY dimTablica.nazTablica, rbrAtrib*/
-        return null;
+    public ArrayList<Attribute> getAttributes(FactTable ft) {
+        ArrayList<Attribute> attributes = new ArrayList<>();
+        try {
+            Statement stmt = dbConn.createStatement();
+            ResultSet rs = stmt.executeQuery(Queries.GET_ATTRIBUTES.replace("SIF_TABLICA", ft.getSifTablica().toString()));
+            while (rs.next()) {
+                Attribute at = new Attribute(rs.getString("imeAtribAgr").trim(), rs.getString("imeSQLAtrib").trim(), rs.getString("nazTablica").trim(), rs.getString("nazSQLTablica").trim());
+                attributes.add(at);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return attributes;
+
+    }
+
+    public ArrayList<Dimension> getDimensions(FactTable ft) {
+        ArrayList<Dimension> dimensions = new ArrayList<>();
+        try {
+            Statement stmt = dbConn.createStatement();
+            ResultSet rs = stmt.executeQuery(Queries.GET_DIMENSIONS.replace("SIF_TABLICA", ft.getSifTablica().toString()));
+            while (rs.next()) {
+                Dimension d = new Dimension(rs.getString("nazTablica").trim(), rs.getString("nazSqlDimTablica").trim(), rs.getString("imeAtrib").trim(), rs.getString("imeSqlAtrib").trim());
+                dimensions.add(d);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return dimensions;
     }
 
 
