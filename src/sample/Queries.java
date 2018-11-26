@@ -22,8 +22,8 @@ public class Queries {
     public static final String GET_DIMENSIONS = "SELECT   dimTablica.nazTablica\n" +
             "       , dimTablica.nazSQLTablica  AS nazSqlDimTablica\n" +
             "       , cinjTablica.nazSQLTablica AS nazSqlCinjTablica\n" +
-            "       , cinjTabAtribut.imeSQLAtrib\n" +
-            "       , dimTabAtribut.imeSqlAtrib\n" +
+            "       , cinjTabAtribut.imeSQLAtrib AS cinjTabSQLAtrib\n" +
+            "       , dimTabAtribut.imeSqlAtrib AS dimTabSQLAtrib\n" +
             "       , tabAtribut.*\n" +
             "  FROM tabAtribut, dimCinj\n" +
             "     , tablica dimTablica, tablica cinjTablica \n" +
@@ -41,4 +41,6 @@ public class Queries {
             "   AND sifCinjTablica = SIF_TABLICA\n" +
             "   AND tabAtribut.sifTipAtrib = 2\n" +
             " ORDER BY dimTablica.nazTablica, rbrAtrib";
+
+    public static final String GET_KEYS = "select t.nazSQLTablica, ta.* from tabAtribut as ta join tablica as t on ta.sifTablica=t.sifTablica where sifTipAtrib=3 SIF_FACT ATRIBS;";
 }

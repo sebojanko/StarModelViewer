@@ -5,12 +5,14 @@ public class Dimension {
     private String nazSqlDimTablica;
     private String imeAtrib;
     private String imeSqlAtrib;
+    private Integer sifTipAtributa;
 
     public Dimension() {
         this.nazTablica = "";
         this.nazSqlDimTablica = "";
         this.imeAtrib = "";
         this.imeSqlAtrib = "";
+        this.sifTipAtributa = 0;
     }
 
     public Dimension(String nazTablica) {
@@ -18,13 +20,20 @@ public class Dimension {
         this.nazSqlDimTablica = "";
         this.imeAtrib = "";
         this.imeSqlAtrib = "";
+        this.sifTipAtributa = 0;
     }
 
-    public Dimension(String nazTablica, String nazSqlDimTablica, String imeAtrib, String imeSqlAtrib) {
+    public Dimension(String nazTablica, String nazSqlDimTablica, String imeAtrib, String imeSqlAtrib, Integer sifTipAtributa) {
         this.nazTablica = nazTablica;
         this.nazSqlDimTablica = nazSqlDimTablica;
         this.imeAtrib = imeAtrib;
         this.imeSqlAtrib = imeSqlAtrib;
+        this.sifTipAtributa = sifTipAtributa;
+
+    }
+
+    public Integer getSifTipAtributa() {
+        return sifTipAtributa;
     }
 
     public String getNazTablica() {

@@ -5,14 +5,16 @@ public class Attribute {
     private String imeSQLAtrib;
     private String nazTablica;
     private String nazSQLTablica;
-    // TODO dodavat stvari kako naide potreba a naici ce
-
+    private String nazAgrFun;
+    private Integer sifTipAtributa;
 
     public Attribute() {
         this.imeAtrib = "";
         this.imeSQLAtrib = "";
         this.nazTablica = "";
         this.nazSQLTablica = "";
+        this.nazAgrFun = "";
+        this.sifTipAtributa = 0;
     }
 
     public Attribute(String nazTablica) {
@@ -20,14 +22,26 @@ public class Attribute {
         this.imeSQLAtrib = "";
         this.nazTablica = nazTablica;
         this.nazSQLTablica = "";
+        this.nazAgrFun = "";
+        this.sifTipAtributa = 0;
     }
 
-    public Attribute(String imeAtrib, String imeSQLAtrib, String nazTablica, String nazSQLTablica) {
+    public Attribute(String imeAtrib, String imeSQLAtrib, String nazTablica, String nazSQLTablica, String nazAgrFun, Integer sifTipAtributa) {
 
         this.imeAtrib = imeAtrib;
         this.imeSQLAtrib = imeSQLAtrib;
         this.nazTablica = nazTablica;
         this.nazSQLTablica = nazSQLTablica;
+        this.nazAgrFun = nazAgrFun;
+        this.sifTipAtributa = sifTipAtributa;
+    }
+
+    public String getNazAgrFun() {
+        return nazAgrFun;
+    }
+
+    public void setNazAgrFun(String nazAgrFun) {
+        this.nazAgrFun = nazAgrFun;
     }
 
     public String getNazTablica() {
@@ -62,11 +76,14 @@ public class Attribute {
         this.imeSQLAtrib = imeSQLAtrib;
     }
 
+    public Integer getSifTipAtributa() {
+        return sifTipAtributa;
+    }
+
     @Override
     public String toString() {
         if (imeAtrib.equals(""))
             return nazTablica;
         return imeAtrib;
     }
-
 }

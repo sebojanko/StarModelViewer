@@ -2,13 +2,15 @@ package sample;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by sebo on 11/20/18.
  * janko.sebastian@gmail.com
  */
 public class MetadataRetriever {
-    private Connection dbConn;
+    static Connection dbConn;
 
     MetadataRetriever() {
         dbConn = connectToDB();
@@ -59,7 +61,7 @@ public class MetadataRetriever {
             Statement stmt = dbConn.createStatement();
             ResultSet rs = stmt.executeQuery(Queries.GET_ATTRIBUTES.replace("SIF_TABLICA", ft.getSifTablica().toString()));
             while (rs.next()) {
-                Attribute at = new Attribute(rs.getString("imeAtribAgr").trim(), rs.getString("imeSQLAtrib").trim(), rs.getString("nazTablica").trim(), rs.getString("nazSQLTablica").trim());
+                Attribute at = new Attribute(rs.getString("imeAtribAgr").trim(), rs.getString("imeSQLAtrib").trim(), rs.getString("nazTablica").trim(), rs.getString("nazSQLTablica").trim(), rs.getString("nazAgrFun").trim(), rs.getInt("sifTipAtrib"));
                 attributes.add(at);
             }
         } catch (SQLException e) {
@@ -75,13 +77,52 @@ public class MetadataRetriever {
             Statement stmt = dbConn.createStatement();
             ResultSet rs = stmt.executeQuery(Queries.GET_DIMENSIONS.replace("SIF_TABLICA", ft.getSifTablica().toString()));
             while (rs.next()) {
-                Dimension d = new Dimension(rs.getString("nazTablica").trim(), rs.getString("nazSqlDimTablica").trim(), rs.getString("imeAtrib").trim(), rs.getString("imeSqlAtrib").trim());
+                Dimension d = new Dimension(rs.getString("nazTablica").trim(), rs.getString("nazSqlDimTablica").trim(), rs.getString("imeAtrib").trim(), rs.getString("imeSqlAtrib").trim(), rs.getInt("sifTipAtrib"));
                 dimensions.add(d);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return dimensions;
+    }
+
+    public ArrayList<WhereAttribs> getKeys(FactTable ft, ArrayList<Dimension> selectedDimensions, ArrayList<Attribute> selectedAttributes) {
+        ArrayList<WhereAttribs> whereAttribs = new ArrayList<>();
+        String attribsQryPart = "";
+        String sifFact = "and ta.sifTablica=" + ft.getSifTablica().toString();
+
+        if (selectedAttributes.size() == 0 && selectedDimensions.size() == 0) return null;
+        if (selectedAttributes.size() == 0) return null;
+        if (selectedDimensions.size() == 0) return null;
+        else {
+            attribsQryPart += "AND (";
+        }
+
+        Set<String> dimensionsSet = new HashSet<>();
+        for (Dimension d : selectedDimensions) {
+            dimensionsSet.add(d.getNazSqlDimTablica());
+        }
+
+        for (String s : dimensionsSet) {
+            attribsQryPart += "ta.imeAtrib like '" + s.replace("Dim", "") + "%' OR ";
+        }
+
+        if (attribsQryPart.length() != 0) {
+            attribsQryPart = attribsQryPart.substring(0, attribsQryPart.length() - 4);
+            attribsQryPart += ")";
+        }
+
+        try {
+            Statement stmt = dbConn.createStatement();
+            ResultSet rs = stmt.executeQuery(Queries.GET_KEYS.replace("SIF_FACT", sifFact).replace("ATRIBS", attribsQryPart));
+            while (rs.next()) {
+                WhereAttribs w = new WhereAttribs(rs.getString("nazSQLTablica").trim(), rs.getString("imeSQLAtrib").trim());
+                whereAttribs.add(w);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return whereAttribs;
     }
 
 
