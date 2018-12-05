@@ -46,12 +46,12 @@ public class SQLGenerator {
 
     public static String generateWHEREStatement(MetadataRetriever mdr, FactTable ft, ArrayList<Dimension> selectedDimensions, ArrayList<Attribute> selectedAttributes) {
         String stmt = "WHERE ";
-        ArrayList<WhereAttribs> whereAttribs = mdr.getKeys(ft, selectedDimensions, selectedAttributes);
+        ArrayList<WhereAttribs> whereAttribs = mdr.getKeysNEW(ft, selectedDimensions, selectedAttributes);
 
         if (whereAttribs == null) return "";
 
         for (WhereAttribs wa : whereAttribs) {
-            stmt += wa.nazSQLTabl + "." + wa.imeSQLAtrib + "=" + "Dim" + wa.imeSQLAtrib.replace("Key", "") + "." + wa.imeSQLAtrib + " AND ";
+            stmt += ft.getNazSQLTablica() + "." + wa.getCinjSQLKey() + "=" + wa.getDimTablica() + "." + wa.getDimSQLKey() + " AND ";
         }
 
         stmt = stmt.substring(0, stmt.length() - 4);
@@ -63,10 +63,10 @@ public class SQLGenerator {
     public static String generateGROUPBYStatement(ArrayList<Dimension> selectedDimensions) {
         if (selectedDimensions.size() == 0) return "";
 
-        String stmt = "GROUP BY ";
+        String stmt = "GROUP BY\n";
 
         for (Dimension d : selectedDimensions) {
-            stmt += d.getNazSqlDimTablica() + "." + d.getImeSqlAtrib() + "\n, ";
+            stmt += d.getNazSqlDimTablica() + "." + d.getImeSqlAtrib() + ", ";
         }
 
         stmt = removeLastComma(stmt);

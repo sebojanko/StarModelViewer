@@ -42,5 +42,12 @@ public class Queries {
             "   AND tabAtribut.sifTipAtrib = 2\n" +
             " ORDER BY dimTablica.nazTablica, rbrAtrib";
 
-    public static final String GET_KEYS = "select t.nazSQLTablica, ta.* from tabAtribut as ta join tablica as t on ta.sifTablica=t.sifTablica where sifTipAtrib=3 SIF_FACT ATRIBS;";
+
+    public static final String GET_KEYS_NEW = "select t.nazSQLTablica as cinjTablica, t2.nazSQLTablica as dimTablica, ta.imeAtrib as cinjKey, ta.imeSQLAtrib as cinjSQLKey, ta2.imeAtrib as dimKey, ta2.imeSQLAtrib as dimSQLKey\n" +
+            "from dimcinj dc join tabAtribut ta on dc.sifCinjTablica=ta.sifTablica\n" +
+            "\t\t\t\tjoin tabAtribut ta2 on dc.sifDimTablica=ta2.sifTablica\n" +
+            "\t\t\t\tjoin tablica t on ta.sifTablica=t.sifTablica\n" +
+            "\t\t\t\tjoin tablica t2 on ta2.sifTablica=t2.sifTablica\n" +
+            "\twhere dc.rbrCinj=ta.rbrAtrib and dc.rbrDim=ta2.rbrAtrib" +
+            "\tand ta.sifTablica=SIF_FACT and ta2.sifTablica in (SIF_DIM);";
 }
